@@ -25,26 +25,101 @@ def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) 
         An approximation of $f'_i(x_0, \ldots, x_{n-1})$
 
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 1.1.
+    # raise NotImplementedError("Need to implement for Task 1.1")
+    # Convert vals to a list to allow modifications
+    args = list(vals)
+
+    # Calculate f(x0, ..., xi + epsilon, ..., xn)
+    args[arg] += epsilon
+    f_plus = f(*args)
+
+    # Calculate f(x0, ..., xi - epsilon, ..., xn)
+    args[arg] = vals[arg] - epsilon  # Reset xi to original and subtract epsilon
+    f_minus = f(*args)
+
+    # Central difference approximation
+    derivative = (f_plus - f_minus) / (2 * epsilon)
+
+    return derivative
 
 
 variable_count = 1
 
 
 class Variable(Protocol):
-    def accumulate_derivative(self, x: Any) -> None: ...
+    def accumulate_derivative(self, x: Any) -> None:
+        """Accumulate the derivative of this variable from backward propagation.
+
+        Args:
+        ----
+            x: The derivative to be accumulated to this variable.
+
+        """
 
     @property
-    def unique_id(self) -> int: ...
+    def unique_id(self) -> int:
+        """Unique identifier for the variable, used to manage references in the computation graph.
 
-    def is_leaf(self) -> bool: ...
+        Returns
+        -------
+            An integer representing the unique identifier of the variable.
 
-    def is_constant(self) -> bool: ...
+        """
+        ...
+
+    def is_leaf(self) -> bool:
+        """Determines if the variable is a leaf in the computation graph.
+
+        A leaf variable has no parents and is typically the starting point of backpropagation.
+
+        Returns
+        -------
+            True if the variable is a leaf, False otherwise.
+
+        """
+        ...
+
+    def is_constant(self) -> bool:
+        """Determines if the variable is a constant within the computation graph.
+
+        Constants do not contribute to gradient computation.
+
+        Returns
+        -------
+            True if the variable is constant, False otherwise.
+
+        """
+        ...
 
     @property
-    def parents(self) -> Iterable["Variable"]: ...
+    def parents(self) -> Iterable["Variable"]:
+        """Provides the parent variables of this variable, if any.
 
-    def chain_rule(self, d_output: Any) -> Iterable[Tuple[Variable, Any]]: ...
+        Parents are the variables from which this variable was derived in the computation graph.
+
+        Returns
+        -------
+            An iterable of parent variables.
+
+        """
+        ...
+
+    def chain_rule(self, d_output: Any) -> Iterable[Tuple[Variable, Any]]:
+        """Applies the chain rule to this variable to compute derivatives for its parents.
+
+        This method should be implemented to specify how to propagate derivatives to parent variables.
+
+        Args:
+        ----
+            d_output: The derivative of the output with respect to this variable.
+
+        Returns:
+        -------
+            An iterable of tuples containing each parent and their respective derivative contribution.
+
+        """
+        ...
 
 
 def topological_sort(variable: Variable) -> Iterable[Variable]:
@@ -59,7 +134,21 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
         Non-constant Variables in topological order starting from the right.
 
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+
+    # TODO: Implement for Task 1.4.
+    # raise NotImplementedError("Need to implement for Task 1.4")
+    def dfs(v: Variable, visited: set, order: List[Variable]) -> None:
+        if v.unique_id in visited:
+            return
+        for input in v.parents:
+            dfs(input, visited, order)
+        visited.add(v.unique_id)
+        order.append(v)
+
+    visited = set()
+    order = []
+    dfs(variable, visited, order)
+    return reversed(order)
 
 
 def backpropagate(variable: Variable, deriv: Any) -> None:
@@ -71,10 +160,33 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
         variable: The right-most variable
         deriv  : Its derivative that we want to propagate backward to the leaves.
 
+    Returns:
+    -------
+    None: Updates the derivative values of each leaf through accumulate_derivative`.
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
 
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 1.4.
+    # raise NotImplementedError("Need to implement for Task 1.4")
+    # Compute the topological order
+    ordered = topological_sort(variable)
+
+    # Initialize derivatives
+    mydict = {}
+    mydict[variable.unique_id] = deriv
+
+    # Iterate through the variables in topological order
+    for var in ordered:
+        d = mydict[var.unique_id]
+        if var.is_leaf():
+            var.accumulate_derivative(d)
+        else:
+            result = var.chain_rule(d)
+            for parent, parent_derivative in result:
+                if parent.unique_id not in mydict:
+                    mydict[parent.unique_id] = parent_derivative
+                else:
+                    mydict[parent.unique_id] += parent_derivative
 
 
 @dataclass
@@ -92,4 +204,15 @@ class Context:
 
     @property
     def saved_tensors(self) -> Tuple[Any, ...]:
+        """Retrieves saved tensors or values that were stored during the forward pass of the computation.
+
+        This method is typically used in gradient computation where intermediate values are required
+        for the backward pass.
+
+        Returns
+        -------
+            A tuple containing the saved tensors or values, which can be of any type. The ellipsis in the
+            type hint indicates that the tuple can contain any number of elements, each of any type.
+
+        """
         return self.saved_values
