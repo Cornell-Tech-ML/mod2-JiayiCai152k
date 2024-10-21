@@ -137,18 +137,20 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
 
     # TODO: Implement for Task 1.4.
     # raise NotImplementedError("Need to implement for Task 1.4")
-    def dfs(v: Variable, visited: set, order: List[Variable]) -> None:
-        if v.unique_id in visited:
-            return
-        for input in v.parents:
-            dfs(input, visited, order)
-        visited.add(v.unique_id)
-        order.append(v)
+    order: List[Variable] = []
+    seen = set()
 
-    visited = set()
-    order = []
-    dfs(variable, visited, order)
-    return reversed(order)
+    def visit(var:Variable) -> None:
+        if var.unique_id in seen or var.is_constant():
+            return
+        if not var.is_leaf():
+            for m in var.parents:
+                if not m.is_constant():
+                    visit(m)
+            seen.add(var.unique_id)
+            order.insert(0,var)
+    visit(variable)
+    return order
 
 
 def backpropagate(variable: Variable, deriv: Any) -> None:
@@ -169,24 +171,23 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
     # TODO: Implement for Task 1.4.
     # raise NotImplementedError("Need to implement for Task 1.4")
     # Compute the topological order
-    ordered = topological_sort(variable)
+    #ordered = topological_sort(variable)
 
     # Initialize derivatives
-    mydict = {}
-    mydict[variable.unique_id] = deriv
 
-    # Iterate through the variables in topological order
-    for var in ordered:
-        d = mydict[var.unique_id]
+    queue = topological_sort(variable)
+    derivatives = {}
+    derivatives[variable.unique_id] = deriv
+    for var in queue:
+        deriv = derivatives[var.unique_id]
         if var.is_leaf():
-            var.accumulate_derivative(d)
+            var.accumulate_derivative(deriv)
         else:
-            result = var.chain_rule(d)
-            for parent, parent_derivative in result:
-                if parent.unique_id not in mydict:
-                    mydict[parent.unique_id] = parent_derivative
-                else:
-                    mydict[parent.unique_id] += parent_derivative
+            for v, d in var.chain_rule(deriv):
+                if v.is_constant():
+                    continue
+                derivatives.setdefault(v.unique_id, 0.0)
+                derivatives[v.unique_id] = derivatives[v.unique_id] + d
 
 
 @dataclass

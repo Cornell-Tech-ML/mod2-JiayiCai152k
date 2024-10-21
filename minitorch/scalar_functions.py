@@ -125,7 +125,7 @@ class Inv(ScalarFunction):
     def backward(ctx: Context, d_output: float) -> float:
         """Performs the backward pass of the operation"""
         (a,) = ctx.saved_values
-        return -(d_output / (a * a))
+        return operators.inv_back(a, d_output)
 
 
 class Neg(ScalarFunction):
@@ -155,8 +155,8 @@ class Sigmoid(ScalarFunction):
     @staticmethod
     def backward(ctx: Context, d_output: float) -> float:
         """Performs the backward pass of the operation"""
-        (sigmoid_val,) = ctx.saved_values
-        return d_output * sigmoid_val * (1 - sigmoid_val)
+        sigma:float = ctx.saved_values[0]
+        return sigma * (1.0 - sigma) * d_output
 
 
 class ReLU(ScalarFunction):
@@ -172,7 +172,7 @@ class ReLU(ScalarFunction):
     def backward(ctx: Context, d_output: float) -> float:
         """Performs the backward pass of the operation"""
         (a,) = ctx.saved_values
-        return d_output if a > 0 else 0.0
+        return operators.relu_back(a, d_output)
 
 
 class Exp(ScalarFunction):
