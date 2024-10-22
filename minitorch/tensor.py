@@ -322,6 +322,9 @@ class Tensor:
     def __rmul__(self, b: TensorLike) -> Tensor:
         return self.__mul__(b)
 
+    def is_close(self, b: TensorLike) -> Tensor:
+        return IsClose.apply(self, self._ensure_tensor(b))
+
     
     def __lt__(self, b: TensorLike) -> Tensor:
         return LT.apply(self, self._ensure_tensor(b))
