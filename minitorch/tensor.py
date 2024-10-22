@@ -120,7 +120,6 @@ class Tensor:
 
     def item(self) -> float:
         """Convert a 1-element tensor to a float"""
-        print("self.size", self.size)
         assert self.size == 1
         x: float = self._tensor._storage[0]
         return x
@@ -334,7 +333,6 @@ class Tensor:
         return EQ.apply(self, self._ensure_tensor(b))
 
     def __neg__(self) -> Tensor:
-        print("check")
         return Neg.apply(self)
 
     def all(self, dim: Optional[int] = None) -> Tensor:
