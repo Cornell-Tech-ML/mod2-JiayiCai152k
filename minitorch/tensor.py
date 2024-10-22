@@ -197,6 +197,7 @@ class Tensor:
 
     def zeros(self, shape: Optional[UserShape] = None) -> Tensor:
         """Create a tensor of zeros with the given shape."""
+
         def zero(shape: UserShape) -> Tensor:
             return Tensor.make(
                 [0.0] * int(operators.prod(shape)), shape, backend=self.backend
@@ -296,25 +297,28 @@ class Tensor:
     def size(self) -> int:
         """Return the total number of elements in the tensor."""
         return self._tensor.size
-    
+
     @property
     def dims(self) -> int:
         """Return the number of dimensions of the tensor."""
         return self._tensor.dims
 
     def __add__(self, b: TensorLike) -> Tensor:
-        #return Add.apply(self, self._ensure_tensor(b))
+        # return Add.apply(self, self._ensure_tensor(b))
         return Add.apply(self, self._ensure_tensor(b))
 
     def __radd__(self, b: TensorLike) -> Tensor:
         return self.__add__(self._ensure_tensor(b))
 
     def __sub__(self, b: TensorLike) -> Tensor:
-        return Add.apply(self, self._ensure_tensor(Neg.apply(self,self._ensure_tensor(b))))
+        return Add.apply(
+            self, self._ensure_tensor(Neg.apply(self, self._ensure_tensor(b)))
+        )
 
     def __rsub__(self, b: TensorLike) -> Tensor:
-        return Add.apply(self._ensure_tensor(Neg.apply(self,self._ensure_tensor(b))), self)
-
+        return Add.apply(
+            self._ensure_tensor(Neg.apply(self, self._ensure_tensor(b))), self
+        )
 
     def __mul__(self, b: TensorLike) -> Tensor:
         return Mul.apply(self, self._ensure_tensor(b))
@@ -326,7 +330,6 @@ class Tensor:
         """Check if Tensors are close."""
         return IsClose.apply(self, self._ensure_tensor(b))
 
-    
     def __lt__(self, b: TensorLike) -> Tensor:
         return LT.apply(self, self._ensure_tensor(b))
 
@@ -343,7 +346,6 @@ class Tensor:
         else:
             return All.apply(self, Tensor.make([dim], (1,), backend=self.backend))
 
-
     def log(self) -> Tensor:
         """Return the element-wise natural logarithm of the tensor."""
         return Log.apply(self)
@@ -352,9 +354,9 @@ class Tensor:
         """Return the element-wise exponential of the tensor."""
         return Exp.apply(self)
 
-    def __gt__(self, b:TensorLike):
-        return LT.apply(self._ensure_tensor(b),self)
-    
+    def __gt__(self, b: TensorLike):
+        return LT.apply(self._ensure_tensor(b), self)
+
     def sigmoid(self) -> Tensor:
         """Return the element-wise sigmoid of the tensor."""
         return Sigmoid.apply(self)
@@ -381,20 +383,17 @@ class Tensor:
 
     def permute(self, *order: int) -> Tensor:
         """Return a tensor with its dimensions permuted in the given order."""
-        order_tensor = tensor(list(order), backend=self.backend)  # Convert the order to a Tensor
+        order_tensor = tensor(
+            list(order), backend=self.backend
+        )  # Convert the order to a Tensor
         return Permute.apply(self, order_tensor)
 
-    def view(self, *shape:int, dim: Optional[int] = None) -> Tensor:
+    def view(self, *shape: int, dim: Optional[int] = None) -> Tensor:
         """Reshape the tensor to the specified shape."""
         new_shape = list(shape)
         shape_tensor = tensor(new_shape, backend=self.backend)
         return View.apply(self, shape_tensor)
 
-
     def zero_grad_(self) -> None:
         """Reset the gradient of the tensor to zero (None)."""
         self.grad = None
-
-    
-
-    

@@ -155,7 +155,7 @@ class Scalar:
         # raise NotImplementedError("Need to implement for Task 1.3")
         # Compute the local derivatives using the last function's backward method
         x = h.last_fn._backward(h.ctx, d_output)
-        return list(zip(h.inputs,x))
+        return list(zip(h.inputs, x))
 
     def backward(self, d_output: Optional[float] = None) -> None:
         """Calls autodiff to fill in the derivatives for the history of this object.

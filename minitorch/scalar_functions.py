@@ -155,7 +155,7 @@ class Sigmoid(ScalarFunction):
     @staticmethod
     def backward(ctx: Context, d_output: float) -> float:
         """Performs the backward pass of the operation"""
-        sigma:float = ctx.saved_values[0]
+        sigma: float = ctx.saved_values[0]
         return sigma * (1.0 - sigma) * d_output
 
 
