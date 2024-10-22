@@ -385,7 +385,9 @@ def tensor_reduce(
 
             # Set the initial value in out storage (from the first value along reduce_dim)
             a_index[:] = out_index[:]
-            a_index[reduce_dim] = 0  # Start reduction from the first element in reduce_dim
+            a_index[reduce_dim] = (
+                0  # Start reduction from the first element in reduce_dim
+            )
             out[out_pos] = a_storage[index_to_position(a_index, a_strides)]
 
             # Iterate over the reduce_dim and apply the reduction function
