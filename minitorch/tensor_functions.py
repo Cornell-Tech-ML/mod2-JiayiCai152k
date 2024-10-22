@@ -105,7 +105,6 @@ class All(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, dim: Optional[Tensor]) -> Tensor:
         """Perform the forward pass."""
-        print("foward!")
         if dim is not None:
             dim_value = int(dim.item())
             if dim_value != -1:

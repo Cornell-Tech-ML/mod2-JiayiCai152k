@@ -377,15 +377,23 @@ def tensor_reduce(
         out_index = np.zeros(len(out_shape), dtype=int)
 
         for i in range(len(out)):
+            # Convert linear index to multidimensional index for out tensor
             to_index(i, out_shape, out_index)
 
+            # Get the position in out storage
             out_pos = index_to_position(out_index, out_strides)
-            out[out_pos] = a_storage[index_to_position(out_index, a_strides)]
-            for j in range(a_shape[reduce_dim]):
+
+            # Set the initial value in out storage (from the first value along reduce_dim)
+            a_index[:] = out_index[:]
+            a_index[reduce_dim] = 0  # Start reduction from the first element in reduce_dim
+            out[out_pos] = a_storage[index_to_position(a_index, a_strides)]
+
+            # Iterate over the reduce_dim and apply the reduction function
+            for j in range(1, a_shape[reduce_dim]):
                 a_index[reduce_dim] = j
                 a_pos = index_to_position(a_index, a_strides)
 
-                # Apply the reduction function
+                # Apply the reduction function to accumulate the result
                 out[out_pos] = fn(out[out_pos], a_storage[a_pos])
 
     return _reduce
