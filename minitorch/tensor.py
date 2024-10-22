@@ -120,6 +120,7 @@ class Tensor:
 
     def item(self) -> float:
         """Convert a 1-element tensor to a float"""
+        print("self.size",self.size)
         assert self.size == 1
         x: float = self._tensor._storage[0]
         return x
@@ -343,7 +344,7 @@ class Tensor:
     def all(self, dim: Optional[int] = None) -> Tensor:
         """Return a tensor indicating if all elements along a dimension are True."""
         if dim is None:
-            return All.apply(self)
+            return All.apply(self,Tensor.make([-1], (1,), backend=self.backend))
         else:
             return All.apply(self, Tensor.make([dim], (1,), backend=self.backend))
 
@@ -366,14 +367,12 @@ class Tensor:
         """Return the element-wise ReLU of the tensor."""
         return ReLU.apply(self)
 
-    def sum(self, dim: Optional[int]) -> Tensor:
+    def sum(self, dim: Optional[int] = None) -> Tensor:
         """Return the sum of elements along a specified dimension or over all elements."""
         if dim is None:
-            # Sum over all dimensions
-            return Sum.apply(self)
+            return Sum.apply(self,Tensor.make([-1], (1,), backend=self.backend))
         else:
-            # Wrap `dim` as a Tensor to satisfy `apply` method
-            return Sum.apply(self, dim)
+            return Sum.apply(self, Tensor.make([dim], (1,), backend=self.backend))
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
         """Return the mean of elements along a specified dimension or over all elements."""

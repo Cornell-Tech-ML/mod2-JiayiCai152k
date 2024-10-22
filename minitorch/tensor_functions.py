@@ -103,10 +103,19 @@ class Add(Function):
 
 class All(Function):
     @staticmethod
-    def forward(ctx: Context, a: Tensor, dim: Optional[int]) -> Tensor:
+    def forward(ctx: Context, a: Tensor, dim: Optional[Tensor]) -> Tensor:
         """Perform the forward pass."""
+        print("foward!")
         if dim is not None:
-            return a.f.mul_reduce(a, dim)
+            dim_value = int(dim.item())
+            if dim_value != -1:
+                print("Jiayi:",a.f.mul_reduce(a, dim_value))
+                return a.f.mul_reduce(a, dim_value)
+            else:
+                out = a
+                for d in range(len(a.shape)):
+                    out = a.f.mul_reduce(out, 0)  # Reduce over the first dimension
+                return out
         else:
             out = a
             for d in range(len(a.shape)):
@@ -196,13 +205,23 @@ class Exp(Function):
 
 class Sum(Function):
     @staticmethod
-    def forward(ctx: Context, a: Tensor, dim: Optional[int]) -> Tensor:
+    def forward(ctx: Context, a: Tensor, dim: Optional[Tensor]) -> Tensor:
         """Perform the forward pass."""
         ctx.save_for_backward(a.shape, dim)
         if dim is not None:
-            return a.f.add_reduce(a, dim)
+            dim_value = int(dim.item())
+            if dim_value != -1:
+                return a.f.add_reduce(a, dim_value)
+            else:
+                out = a
+                for d in range(len(a.shape)):
+                    out = a.f.add_reduce(out, 0)  # Reduce over the first dimension
+                return out
         else:
-            return a.f.add_reduce(a.contiguous().view(int(operators.prod(a.shape))), 0)
+            out = a
+            for d in range(len(a.shape)):
+                out = a.f.add_reduce(out, 0)  # Reduce over the first dimension
+            return out
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
@@ -292,7 +311,7 @@ class View(Function):
         """Matrix Multiply backward (module 3)"""
         (original,) = ctx.saved_values
         return (
-            minitorch.Tensor.make(
+            Tensor.make(
                 grad_output._tensor._storage, original, backend=grad_output.backend
             ),
             0.0,
