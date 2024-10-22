@@ -323,6 +323,7 @@ class Tensor:
         return self.__mul__(b)
 
     def is_close(self, b: TensorLike) -> Tensor:
+        """Check if Tensors are close."""
         return IsClose.apply(self, self._ensure_tensor(b))
 
     
