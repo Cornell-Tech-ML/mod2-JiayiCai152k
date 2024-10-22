@@ -348,7 +348,7 @@ class Tensor:
         """Return the element-wise exponential of the tensor."""
         return Exp.apply(self)
 
-    def __gt__(self, b):
+    def __gt__(self, b:TensorLike):
         return LT.apply(self._ensure_tensor(b),self)
     
     def sigmoid(self) -> Tensor:
@@ -377,7 +377,8 @@ class Tensor:
 
     def permute(self, *order: int) -> Tensor:
         """Return a tensor with its dimensions permuted in the given order."""
-        return Permute.apply(self, order)
+        order_tensor = tensor(list(order), backend=self.backend)  # Convert the order to a Tensor
+        return Permute.apply(self, order_tensor)
 
     def view(self, shape:Tensor) -> Tensor:
         """Reshape the tensor to the specified shape."""

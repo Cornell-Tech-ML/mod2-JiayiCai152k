@@ -181,6 +181,7 @@ class SimpleOps(TensorOps):
     def reduce(
         fn: Callable[[float, float], float], start: float = 0.0
     ) -> Callable[["Tensor", int], "Tensor"]:
+        """Reduce."""
         """Higher-order tensor reduce function. ::
 
           fn_reduce = reduce(fn)

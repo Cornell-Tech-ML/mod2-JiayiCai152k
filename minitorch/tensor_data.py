@@ -118,8 +118,12 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     """
     # TODO: Implement for Task 2.2.
     #raise NotImplementedError("Need to implement for Task 2.2")
+    
     result_shape = []
     
+    shape1 = tuple(shape1)
+    shape2 = tuple(shape2)
+
     len_shape1 = len(shape1)
     len_shape2 = len(shape2)
     
