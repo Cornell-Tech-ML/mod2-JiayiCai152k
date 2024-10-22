@@ -202,10 +202,7 @@ class Sum(Function):
         if dim is not None:
             return a.f.add_reduce(a, dim)
         else:
-            out = a
-            for d in range(len(a.shape)):  # Iterate over all dimensions
-                out = a.f.add_reduce(out, 0)  # Reduce along the first dimension
-            return out
+            return a.f.add_reduce(a.contiguous().view(int(operators.prod(a.shape))), 0)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:

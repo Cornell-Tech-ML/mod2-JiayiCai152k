@@ -312,12 +312,12 @@ class Tensor:
 
     def __sub__(self, b: TensorLike) -> Tensor:
         return Add.apply(
-            self, self._ensure_tensor(Neg.apply(self, self._ensure_tensor(b)))
+            self, -self._ensure_tensor(b)
         )
 
     def __rsub__(self, b: TensorLike) -> Tensor:
         return Add.apply(
-            self._ensure_tensor(Neg.apply(self, self._ensure_tensor(b))), self
+            self, -self._ensure_tensor(b)
         )
 
     def __mul__(self, b: TensorLike) -> Tensor:
@@ -337,6 +337,7 @@ class Tensor:
         return EQ.apply(self, self._ensure_tensor(b))
 
     def __neg__(self) -> Tensor:
+        print("check")
         return Neg.apply(self)
 
     def all(self, dim: Optional[int] = None) -> Tensor:
@@ -365,14 +366,14 @@ class Tensor:
         """Return the element-wise ReLU of the tensor."""
         return ReLU.apply(self)
 
-    def sum(self, dim: Optional[int] = None) -> Tensor:
+    def sum(self, dim: Optional[int]) -> Tensor:
         """Return the sum of elements along a specified dimension or over all elements."""
         if dim is None:
             # Sum over all dimensions
             return Sum.apply(self)
         else:
             # Wrap `dim` as a Tensor to satisfy `apply` method
-            return Sum.apply(self, Tensor.make([dim], (1,), backend=self.backend))
+            return Sum.apply(self, dim)
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
         """Return the mean of elements along a specified dimension or over all elements."""
