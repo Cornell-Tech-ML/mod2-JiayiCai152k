@@ -120,7 +120,7 @@ class Tensor:
 
     def item(self) -> float:
         """Convert a 1-element tensor to a float"""
-        print("self.size",self.size)
+        print("self.size", self.size)
         assert self.size == 1
         x: float = self._tensor._storage[0]
         return x
@@ -312,14 +312,10 @@ class Tensor:
         return self.__add__(self._ensure_tensor(b))
 
     def __sub__(self, b: TensorLike) -> Tensor:
-        return Add.apply(
-            self, -self._ensure_tensor(b)
-        )
+        return Add.apply(self, -self._ensure_tensor(b))
 
     def __rsub__(self, b: TensorLike) -> Tensor:
-        return Add.apply(
-            self, -self._ensure_tensor(b)
-        )
+        return Add.apply(self, -self._ensure_tensor(b))
 
     def __mul__(self, b: TensorLike) -> Tensor:
         return Mul.apply(self, self._ensure_tensor(b))
@@ -344,7 +340,7 @@ class Tensor:
     def all(self, dim: Optional[int] = None) -> Tensor:
         """Return a tensor indicating if all elements along a dimension are True."""
         if dim is None:
-            return All.apply(self,Tensor.make([-1], (1,), backend=self.backend))
+            return All.apply(self, Tensor.make([-1], (1,), backend=self.backend))
         else:
             return All.apply(self, Tensor.make([dim], (1,), backend=self.backend))
 
@@ -370,7 +366,7 @@ class Tensor:
     def sum(self, dim: Optional[int] = None) -> Tensor:
         """Return the sum of elements along a specified dimension or over all elements."""
         if dim is None:
-            return Sum.apply(self,Tensor.make([-1], (1,), backend=self.backend))
+            return Sum.apply(self, Tensor.make([-1], (1,), backend=self.backend))
         else:
             return Sum.apply(self, Tensor.make([dim], (1,), backend=self.backend))
 

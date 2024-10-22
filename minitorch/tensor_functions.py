@@ -109,7 +109,7 @@ class All(Function):
         if dim is not None:
             dim_value = int(dim.item())
             if dim_value != -1:
-                print("Jiayi:",a.f.mul_reduce(a, dim_value))
+                print("Jiayi:", a.f.mul_reduce(a, dim_value))
                 return a.f.mul_reduce(a, dim_value)
             else:
                 out = a
