@@ -380,9 +380,12 @@ class Tensor:
         order_tensor = tensor(list(order), backend=self.backend)  # Convert the order to a Tensor
         return Permute.apply(self, order_tensor)
 
-    def view(self, shape:Tensor) -> Tensor:
+    def view(self, *shape:int, dim: Optional[int] = None) -> Tensor:
         """Reshape the tensor to the specified shape."""
-        return View.apply(self, shape)
+        new_shape = list(shape)
+        shape_tensor = tensor(new_shape, backend=self.backend)
+        return View.apply(self, shape_tensor)
+
 
     def zero_grad_(self) -> None:
         """Reset the gradient of the tensor to zero (None)."""
