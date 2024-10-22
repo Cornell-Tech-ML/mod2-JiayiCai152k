@@ -112,13 +112,13 @@ class All(Function):
             else:
                 out = a
                 for d in range(len(a.shape)):
-                    out = a.f.mul_reduce(out, 0)  # Reduce over the first dimension
-                return out
+                    out = a.f.mul_reduce(out, 0)  # Reduce over the first dimension each time
+                return a.f.mul_reduce(out, 1)
         else:
             out = a
             for d in range(len(a.shape)):
-                out = a.f.mul_reduce(out, 0)  # Reduce over the first dimension
-            return out
+                out = a.f.mul_reduce(out, 0)  # Reduce over the first dimension each time
+            return a.f.mul_reduce(out, 1)
 
 
 # TODO: Implement for Task 2.3.
@@ -214,11 +214,13 @@ class Sum(Function):
                 out = a
                 for d in range(len(a.shape)):
                     out = a.f.add_reduce(out, 0)  # Reduce over the first dimension
-                return out
+                out = a.f.add_reduce(out, 1) 
+                return out.view(1)
+                #return a.f.add_reduce(a, dim_value).view(1)
         else:
             out = a
             for d in range(len(a.shape)):
-                out = a.f.add_reduce(out, 0)  # Reduce over the first dimension
+                out = a.f.add_reduce(out, 1)  # Reduce over the first dimension
             return out
 
     @staticmethod
