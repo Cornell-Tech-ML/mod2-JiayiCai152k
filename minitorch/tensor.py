@@ -377,9 +377,7 @@ class Tensor:
 
     def permute(self, *order: int) -> Tensor:
         """Return a tensor with its dimensions permuted in the given order."""
-        order_tensor = tensor(
-            list(order), backend=self.backend
-        )  # Convert the order to a Tensor
+        order_tensor = tensor(list(order), backend=self.backend)
         return Permute.apply(self, order_tensor)
 
     def view(self, *shape: int, dim: Optional[int] = None) -> Tensor:
