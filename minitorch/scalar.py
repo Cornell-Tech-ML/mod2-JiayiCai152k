@@ -112,21 +112,50 @@ class Scalar:
         return self.history is not None and self.history.last_fn is None
 
     def is_constant(self) -> bool:
+        """Check if the Scalar is a constant value (no history).
+
+        Returns
+        -------
+            True if the Scalar is a constant value, False otherwise.
+
+        """
         return self.history is None
 
     @property
     def parents(self) -> Iterable[Variable]:
-        """Get the variables used to create this one."""
+        """Get the parent Scalar variables that were used to compute this Scalar.
+
+        Returns
+        -------
+            An iterable of the parent Scalar variables.
+
+        """
         assert self.history is not None
         return self.history.inputs
 
     def chain_rule(self, d_output: Any) -> Iterable[Tuple[Variable, Any]]:
+        """Apply the chain rule to compute the derivatives of the parent Scalar variables.
+
+        Args:
+        ----
+            d_output: The derivative of the output with respect to some quantity.
+
+        Returns:
+        -------
+            An iterable of (parent Scalar, derivative) tuples, representing the
+            derivatives of the parent Scalars with respect to the output.
+
+        """
         h = self.history
         assert h is not None
         assert h.last_fn is not None
         assert h.ctx is not None
 
-        raise NotImplementedError("Need to include this file from past assignment.")
+        # TODO: Implement for Task 1.3.
+        # raise NotImplementedError("Need to implement for Task 1.3")
+        # Compute the local derivatives using the last function's backward method
+        x = h.last_fn._backward(h.ctx, d_output)
+        return list(zip(h.inputs, x))
 
     def backward(self, d_output: Optional[float] = None) -> None:
         """Calls autodiff to fill in the derivatives for the history of this object.
@@ -141,17 +170,73 @@ class Scalar:
             d_output = 1.0
         backpropagate(self, d_output)
 
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 1.2.
+    # raise NotImplementedError("Need to implement for Task 1.2")
+    def __add__(self, other: ScalarLike) -> Scalar:
+        return Add.apply(self, other)
+
+    def __sub__(self, other: ScalarLike) -> Scalar:
+        return Add.apply(self, -other)
+
+    def __neg__(self) -> Scalar:
+        return Neg.apply(self)
+
+    def __lt__(self, other: ScalarLike) -> Scalar:
+        return LT.apply(self, other)
+
+    def __gt__(self, other: ScalarLike) -> Scalar:
+        return LT.apply(other, self)
+
+    def __eq__(self, other: ScalarLike) -> Scalar:
+        return EQ.apply(other, self)
+
+    def sigmoid(self) -> Scalar:
+        """Apply the sigmoid activation function to the Scalar.
+
+        Returns
+        -------
+            A new Scalar representing the result of the sigmoid function applied to the original Scalar.
+
+        """
+        return Sigmoid.apply(self)
+
+    def relu(self) -> Scalar:
+        """Apply the ReLU (Rectified Linear Unit) activation function to the Scalar.
+
+        Returns
+        -------
+            A new Scalar representing the result of the ReLU function applied to the original Scalar.
+
+        """
+        return ReLU.apply(self)
+
+    def exp(self) -> Scalar:
+        """Apply the exponential function to the Scalar."""
+        return Exp.apply(self)
+
+    def log(self) -> Scalar:
+        """Apply the natural logarithm function to the Scalar.
+
+        Returns
+        -------
+            A new Scalar representing the result of the natural logarithm function applied to the original Scalar.
+
+        """
+        return Log.apply(self)
 
 
 def derivative_check(f: Any, *scalars: Scalar) -> None:
     """Checks that autodiff works on a python function.
     Asserts False if derivative is incorrect.
 
-    Parameters
-    ----------
-        f : function from n-scalars to 1-scalar.
+    Args:
+    ----
+        f  (Any): function from n-scalars to 1-scalar.
         *scalars  : n input scalar values.
+
+    Returns:
+    -------
+        None: Updates the derivative values of each leaf through accumulate_derivative`.
 
     """
     out = f(*scalars)

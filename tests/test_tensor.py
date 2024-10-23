@@ -9,6 +9,7 @@ from minitorch import MathTestVariable, Tensor, grad_check, tensor
 from .strategies import assert_close, small_floats
 from .tensor_strategies import shaped_tensors, tensors
 
+
 one_arg, two_arg, red_arg = MathTestVariable._comp_testing()
 
 
@@ -28,7 +29,11 @@ def test_one_args(
 ) -> None:
     """Test one-arg functions compared to floats"""
     name, base_fn, tensor_fn = fn
+    print(f"Testing function: {name}")
+    print(f"t1: {t1}")
     t2 = tensor_fn(t1)
+    print(f"t1: {t1}")
+    print(f"t2: {t2}")
     for ind in t2._tensor.indices():
         assert_close(t2[ind], base_fn(t1[ind]))
 
