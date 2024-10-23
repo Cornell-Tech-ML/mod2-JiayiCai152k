@@ -192,7 +192,7 @@ class Exp(Function):
     def forward(ctx: Context, t1: Tensor) -> Tensor:
         """Perform the forward pass."""
         out = t1.f.exp_map(t1)
-        ctx.save_for_backward(out)
+        ctx.save_for_backward(t1)
         return out
 
     @staticmethod
