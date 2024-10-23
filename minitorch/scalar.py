@@ -176,7 +176,7 @@ class Scalar:
         return Add.apply(self, other)
 
     def __sub__(self, other: ScalarLike) -> Scalar:
-        return Add.apply(self, Neg.apply(other))
+        return Add.apply(self, -other)
 
     def __neg__(self) -> Scalar:
         return Neg.apply(self)
@@ -186,6 +186,9 @@ class Scalar:
 
     def __gt__(self, other: ScalarLike) -> Scalar:
         return LT.apply(other, self)
+
+    def __eq__(self, other: ScalarLike) -> Scalar:
+        return EQ.apply(other, self)
 
     def sigmoid(self) -> Scalar:
         """Apply the sigmoid activation function to the Scalar.
@@ -220,9 +223,6 @@ class Scalar:
 
         """
         return Log.apply(self)
-
-    def __eq__(self, other: ScalarLike) -> Scalar:
-        return EQ.apply(self, other)
 
 
 def derivative_check(f: Any, *scalars: Scalar) -> None:

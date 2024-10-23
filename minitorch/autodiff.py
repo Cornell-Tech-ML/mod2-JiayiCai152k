@@ -28,20 +28,12 @@ def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) 
     # TODO: Implement for Task 1.1.
     # raise NotImplementedError("Need to implement for Task 1.1")
     # Convert vals to a list to allow modifications
-    args = list(vals)
-
-    # Calculate f(x0, ..., xi + epsilon, ..., xn)
-    args[arg] += epsilon
-    f_plus = f(*args)
-
-    # Calculate f(x0, ..., xi - epsilon, ..., xn)
-    args[arg] = vals[arg] - epsilon  # Reset xi to original and subtract epsilon
-    f_minus = f(*args)
-
-    # Central difference approximation
-    derivative = (f_plus - f_minus) / (2 * epsilon)
-
-    return derivative
+    vals1 = [v for v in vals]
+    vals2 = [v for v in vals]
+    vals1[arg] = vals[arg] + epsilon
+    vals2[arg] = vals2[arg] - epsilon
+    delta = f(*vals1) - f(*vals2)
+    return delta / (2 * epsilon)
 
 
 variable_count = 1
@@ -146,8 +138,8 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
             for m in var.parents:
                 if not m.is_constant():
                     visit(m)
-            seen.add(var.unique_id)
-            order.insert(0, var)
+        seen.add(var.unique_id)
+        order.insert(0, var)
 
     visit(variable)
     return order
