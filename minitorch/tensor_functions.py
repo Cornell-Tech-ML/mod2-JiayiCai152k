@@ -119,13 +119,13 @@ class Mul(Function):
     @staticmethod
     def forward(ctx: Context, t1: Tensor, t2: Tensor) -> Tensor:
         """Perform the forward pass."""
-        ctx.save_for_backward((t1, t2))
+        ctx.save_for_backward(t1, t2)
         return t1.f.mul_zip(t1, t2)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> tuple[Tensor, Tensor]:
         """Perform the backward pass."""
-        (t1, t2) = ctx.saved_values
+        t1, t2 = ctx.saved_values
         return t1.f.mul_zip(t2, grad_output), t1.f.mul_zip(t1, grad_output)
 
 
@@ -484,7 +484,6 @@ but was expecting derivative %f from central difference.
     for i, x in enumerate(vals):
         ind = x._tensor.sample()
         check = grad_central_difference(f, *vals, arg=i, ind=ind)
-        print("Jiayi grad x,", x)
         assert x.grad is not None
         np.testing.assert_allclose(
             x.grad[ind],
