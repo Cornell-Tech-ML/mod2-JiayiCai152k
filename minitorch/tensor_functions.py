@@ -279,11 +279,21 @@ class Permute(Function):
         return t1._new(tensor1)
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> Tensor:
-        """Perform the backward pass."""
-        order = ctx.saved_values
-        order = [a[0] for a in sorted(enumerate(order), key=lambda a: a[1])]
-        return grad_output._new(grad_output._tensor.permute(*order))
+    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
+        """Perform the backward pass by applying the inverse of the forward permutation."""
+        # Retrieve the saved permutation order
+        (order,) = ctx.saved_values  # Unpack saved values, should be the list 'ordern'
+
+        # Compute the inverse permutation
+        inv_order = [0] * len(order)  # Initialize the inverse order list with zeros
+        for i, o in enumerate(order):
+            inv_order[o] = i  # Map each element to its inverse position
+
+        # Apply the inverse permutation to grad_output
+        grad_input = grad_output._new(grad_output._tensor.permute(*inv_order))
+
+        # Return the gradient with respect to the first input (t1), and None for the second input (order)
+        return grad_input, 0.0
 
 
 class View(Function):
