@@ -151,16 +151,26 @@ class Sigmoid(Function):
     def forward(ctx: Context, t1: Tensor) -> Tensor:
         """Perform the forward pass."""
         out = t1.f.sigmoid_map(t1)
-        ctx.save_for_backward(out)
+        ctx.save_for_backward(t1)
         return out
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         """Perform the backward pass."""
         (out,) = ctx.saved_values
-        return grad_output.f.mul_zip(
-            grad_output, out.f.mul_zip(out, out.f.inv_map(out))
+        # return grad_output.f.mul_zip(
+        #    grad_output, out.f.mul_zip(out, out.f.inv_map(out))
+        # )
+        part1 = grad_output.f.mul_zip(grad_output, grad_output.f.sigmoid_map(out))
+
+        # Second part, negating the product of sigmoid and its square
+        sigmoid_out = grad_output.f.sigmoid_map(out)
+        part2 = grad_output.f.neg_map(
+            grad_output.f.mul_zip(
+                grad_output, grad_output.f.mul_zip(sigmoid_out, sigmoid_out)
+            )
         )
+        return grad_output.f.add_zip(part1, part2)
 
 
 class Log(Function):
