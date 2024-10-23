@@ -213,8 +213,6 @@ class SimpleOps(TensorOps):
 
         def ret(a: "Tensor", dim: int) -> "Tensor":
             out_shape = list(a.shape)
-            print("jiayi dim", dim)
-            print("jiayi shape", out_shape)
             out_shape[dim] = 1
 
             # Other values when not sum.

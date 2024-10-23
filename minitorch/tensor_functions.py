@@ -123,10 +123,10 @@ class Mul(Function):
         return t1.f.mul_zip(t1, t2)
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
+    def backward(ctx: Context, grad_output: Tensor) -> tuple[Tensor, Tensor]:
         """Perform the backward pass."""
-        t1, t2 = ctx.saved_values
-        return (t2 * grad_output, t1 * grad_output)
+        (t1, t2) = ctx.saved_values
+        return t1.f.mul_zip(t2, grad_output), t1.f.mul_zip(t1, grad_output)
 
 
 class ReLU(Function):
@@ -189,7 +189,8 @@ class Exp(Function):
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         """Perform the backward pass."""
         (out,) = ctx.saved_values
-        return grad_output.f.exp_map(grad_output, out)
+        # return grad_output.f.exp_map(grad_output, out)
+        return grad_output.f.exp_map(out) * grad_output
 
 
 class Sum(Function):
